@@ -174,6 +174,9 @@ svg.scene{position:absolute;inset:0;width:100%;height:100%;display:block}
 .gbig{position:absolute;left:50%;top:40%;z-index:31;transform:translate(-50%,-50%);text-align:center;font:400 11cqw/1 'Luckiest Guy',Impact,sans-serif;color:#fff;-webkit-text-stroke:1.8cqw #000;paint-order:stroke fill;text-shadow:0 1.4cqw 0 #000;animation:stampin .55s cubic-bezier(.3,1.7,.5,1) both;white-space:nowrap}
 .gbig b{display:block;font-size:26cqw;color:var(--green);text-shadow:0 1.6cqw 0 #000,0 0 8cqw #3ee36b}
 .opt.b{background:radial-gradient(circle at 50% 50%,#58e67d,#167a35)}
+.cam{transition:transform .9s cubic-bezier(.45,0,.25,1)}
+.wc .hf{animation:spin .6s linear infinite}.wc .hs{animation:spin 7s linear infinite}
+.wc.spin .hf{animation-duration:.15s}.wc.spin .hs{animation-duration:1.6s}
 </style>
 </head>
 <body>
@@ -194,8 +197,7 @@ svg.scene{position:absolute;inset:0;width:100%;height:100%;display:block}
    narração gravados, coloque os caminhos aqui. Se ficar vazio,
    o episódio usa a voz sintética pt-BR do navegador.
    =========================================================== */
-const NARRACAO_ARQUIVOS = [ // coloque aqui os MP3 da narração, um por cena (0–17)
-'',
+const NARRACAO_ARQUIVOS = [ // coloque aqui os MP3 da narração, um por cena (0–16)
 '',
 '',
 '',
@@ -216,9 +218,8 @@ const NARRACAO_ARQUIVOS = [ // coloque aqui os MP3 da narração, um por cena (0
 ];
 // Narração contínua do episódio (uma fala por cena)
 const NARRACAO_TEXTO = [
-  "Vocês não conseguiram decidir! Dentes e quarto empataram. Então o Roberto vai ter que encarar as duas missões de uma vez!",
+  "Vocês escolheram... EMPATE! Então o Roberto vai arrumar os dentes... e arrumar o quarto!",
   "Nove dias... até o encontro!",
-  "Pois é... o Roberto queria escolher só uma missão, mas vocês decidiram que ele precisava fazer as duas.",
   "Primeiro, vamos resolver uma situação que já estava passando dos limites: o sorriso do Roberto. Boca fechada... não convence. Boca aberta... melhor não.",
   "Ele foi atrás de um dentista profissional pra resolver tudo do jeito certo. Depois da avaliação, o plano ficou claro: clareamento, repor o dente que faltava, e começar o alinhamento.",
   "Primeiro, veio o clareamento. Nada de improvisar em casa: o Roberto deixou essa parte nas mãos de um profissional.",
@@ -237,6 +238,9 @@ const NARRACAO_TEXTO = [
 ];
 const MUSICA_ARQUIVO = ''; // ex.: 'musica-ep1.mp3' (substitui a trilha sintetizada)
 
+// aparelho ortodôntico (bráquetes + fio), episódio 2
+const BRACES_A='<path d="M79 124.6 Q103 133 126 119.6" stroke="#aeb7c2" stroke-width="1.3" fill="none"/><rect x="81.4" y="123.7" width="5.2" height="5.2" rx="1" fill="#e9eef4" stroke="#4a5260" stroke-width="1.1"/><rect x="90.4" y="126.0" width="5.2" height="5.2" rx="1" fill="#e9eef4" stroke="#4a5260" stroke-width="1.1"/><rect x="99.9" y="126.80000000000001" width="5.2" height="5.2" rx="1" fill="#e9eef4" stroke="#4a5260" stroke-width="1.1"/><rect x="108.9" y="125.4" width="5.2" height="5.2" rx="1" fill="#e9eef4" stroke="#4a5260" stroke-width="1.1"/><rect x="117.4" y="122.0" width="5.2" height="5.2" rx="1" fill="#e9eef4" stroke="#4a5260" stroke-width="1.1"/>';
+const BRACES_B='<path d="M87 128.6 Q102 133 117 127.4" stroke="#aeb7c2" stroke-width="1.1" fill="none"/><rect x="88.8" y="127.8" width="4.4" height="4.4" rx="1" fill="#e9eef4" stroke="#4a5260" stroke-width="1"/><rect x="97.8" y="129.10000000000002" width="4.4" height="4.4" rx="1" fill="#e9eef4" stroke="#4a5260" stroke-width="1"/><rect x="106.8" y="128.4" width="4.4" height="4.4" rx="1" fill="#e9eef4" stroke="#4a5260" stroke-width="1"/><rect x="113.8" y="125.8" width="4.4" height="4.4" rx="1" fill="#e9eef4" stroke="#4a5260" stroke-width="1"/>';
 /* ================= PERSONAGEM: ROBERTO ================= */
 const INK='#1a1a1a', SKIN='#f0c096', SKIN_D='#d99c72', SHIRT='#9b9a96', HAIR='#3b2a1e';
 function robInner(m='neutral',o={}){
@@ -273,8 +277,8 @@ function robInner(m='neutral',o={}){
     smile:`<path d="M74 122 Q102 152 130 116 Q104 130 74 122Z" fill="#5a1a1a" stroke="${INK}" stroke-width="3.5" stroke-linejoin="round"/>
       <path d="M78 123.5 Q103 132 127 118 L124 126 Q103 138 82 129Z" fill="${o.teeth?'#f4efe0':'#e9d46a'}" stroke="${INK}" stroke-width="2"/>
       <path d="M90 127 L91 133 M99 128 L100 135 M108 126 L108 133 M117 122 L116 129" stroke="${o.teeth?'#cfc4a8':'#9b8a2a'}" stroke-width="2"/>
-      ${(!o.teeth||o.teeth==='white')?'<rect x="102" y="127" width="5" height="6" fill="#5a1a1a"/>':''}${o.teeth==='braces'?'<path d="M80 126 Q103 134 125 120" stroke="#7d8896" stroke-width="1.8" fill="none"/><path d="M85 125.5h4M94 128h4M103 128.6h4M112 127h4M120 123.4h4" stroke="#56606e" stroke-width="3"/>':''}`,
-    happy:`<path d="M82 126 Q101 144 122 124 Q102 132 82 126Z" fill="#5a1a1a" stroke="${INK}" stroke-width="3"/><path d="M85 127 Q102 133 119 125 L118 129 Q102 136 87 130Z" fill="${o.teeth?'#f4efe0':'#ecdc84'}"/>${o.teeth==='braces'?'<path d="M86 129 Q102 134 118 127" stroke="#7d8896" stroke-width="1.6" fill="none"/>':''}`
+      ${(!o.teeth||o.teeth==='white')?'<rect x="102" y="127" width="5" height="6" fill="#5a1a1a"/>':''}${o.teeth==='braces'?BRACES_A:''}`,
+    happy:`<path d="M82 126 Q101 144 122 124 Q102 132 82 126Z" fill="#5a1a1a" stroke="${INK}" stroke-width="3"/><path d="M85 127 Q102 133 119 125 L118 129 Q102 136 87 130Z" fill="${o.teeth?'#f4efe0':'#ecdc84'}"/>${o.teeth==='braces'?BRACES_B:''}`
   }[m];
   const phones = o.phones==='head'
     ? `<path d="M50 96 Q46 18 100 16 Q156 16 154 94" stroke="#222" stroke-width="10" fill="none"/><path d="M50 96 Q46 18 100 16 Q156 16 154 94" stroke="#555" stroke-width="3" fill="none"/>
@@ -538,6 +542,10 @@ function diagItem(n,t){const l=$('dlist');if(l)l.insertAdjacentHTML('beforeend',
 function closeup(stage,mark,cls=''){$('closeup')?.remove();fx.insertAdjacentHTML('beforeend',`<div class="closeup ${cls}" id="closeup">${bigSmile(stage,mark)}</div>`)}
 function closeupHide(){$('closeup')?.remove()}
 function clock(label){$('clk')?.remove();fx.insertAdjacentHTML('beforeend',`<div class="clk" id="clk"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="#fff" stroke="#000" stroke-width="7"/>${Array.from({length:12},(_,i)=>`<path d="M50 12 V18" stroke="#000" stroke-width="4" transform="rotate(${i*30} 50 50)"/>`).join('')}<path class="hand fast" d="M50 50 V16" stroke="#e8483b" stroke-width="5" stroke-linecap="round"/><path class="hand slow" d="M50 50 V30" stroke="#000" stroke-width="6" stroke-linecap="round"/><circle cx="50" cy="50" r="5"/></svg><span>${label}</span></div>`)}
+// relógio de parede: desenhado DENTRO do cenário (acompanha a câmera)
+function wallClock(x,y,r,mode='fast'){const sv=layer.querySelector('svg');if(!sv)return;
+  const ticks=Array.from({length:12},(_,i)=>`<path d="M${x} ${y-r+4} V${y-r+9}" stroke="${INK}" stroke-width="2.5" transform="rotate(${i*30} ${x} ${y})"/>`).join('');
+  sv.insertAdjacentHTML('beforeend',`<g class="wc ${mode}"><circle cx="${x}" cy="${y}" r="${r}" fill="#fff" stroke="${INK}" stroke-width="5"/>${ticks}<path class="hf" style="transform-origin:${x}px ${y}px" d="M${x} ${y} V${y-r+7}" stroke="#e8483b" stroke-width="3" stroke-linecap="round"/><path class="hs" style="transform-origin:${x}px ${y}px" d="M${x} ${y} V${y-r+13}" stroke="${INK}" stroke-width="4" stroke-linecap="round"/><circle cx="${x}" cy="${y}" r="3" fill="${INK}"/></g>`)}
 function clockHide(){$('clk')?.remove()}
 function banner(t,cls=''){$('ban')?.remove();if(t)fx.insertAdjacentHTML('beforeend',`<div class="ban ${cls}" id="ban">${t}</div>`)}
 function sparkEyes(){fx.insertAdjacentHTML('beforeend',`<div class="spk" style="left:34%;top:66%">✦</div><div class="spk" style="left:55%;top:66%;animation-delay:.2s">✦</div><div class="spk sm" style="left:28%;top:60%;animation-delay:.4s">✦</div><div class="spk sm" style="left:66%;top:61%;animation-delay:.1s">✦</div>`)}
@@ -552,27 +560,22 @@ function voteScreen(a,b,top,q){return `<div class="vote" id="vote">${a}${b}<div 
 const OPT_DENTES=`<button class="opt a" data-v="DENTES" tabindex="-1"><svg viewBox="25 30 150 175">${robInner('smile',{})}</svg><span class="lab">DENTES</span><span class="desc">Melhorar o sorriso.</span></button>`;
 const OPT_QUARTO=`<button class="opt b" data-v="QUARTO" tabindex="-1"><svg viewBox="40 250 280 330" preserveAspectRatio="xMidYMid slice">${room(false)}${robSvg(110,270,150,'shock',{phones:'neck'})}</svg><span class="lab">QUARTO</span><span class="desc">Limpar e organizar tudo.</span></button>`;
 
+// zoom suave: 30% da intensidade (só o tour do quarto usa zoom forte)
+const camRaw=camTo;
+camTo=function(sc=1,x=0,y=0,cut=false,full=false){const k=full?1:.3;camRaw(1+(sc-1)*k,x*k,y*k,cut)};
 /* ================= ROTEIRO — EPISÓDIO 2 · DIA 2 ================= */
 const PN={phones:'neck'};
 const SCENES=[
-// 0 — Resultado da votação: EMPATE
-{ dur:8.5, music:'vote', build:()=>voteScreen(OPT_DENTES,OPT_QUARTO,'RESULTADO DA VOTAÇÃO DO DIA 1','DENTES OU QUARTO?'), cues:[
-  [0,()=>{camTo(1,0,0,true);flash();sfx('whoosh');cap('')}],
-  [.9,()=>{sfx('tick')}],[1.4,()=>{sfx('tick')}],[1.9,()=>{sfx('tick')}],
-  [2.5,()=>{$('vote').classList.add('tie');sfx('boing');shake();fx.insertAdjacentHTML('beforeend','<div class="stamp">EMPATE!</div>')}],
-  [4.4,()=>{$('vote').querySelectorAll('.opt').forEach(o=>o.classList.add('sel'));sfx('success');cap('AS <em>DUAS MISSÕES</em> FORAM APROVADAS!','top')}],
-  [6.6,()=>{cap('ROBERTO VAI TER QUE FAZER <em>OS DOIS!</em>','green');sfx('pop')}]]},
+// 0 — Abre no quarto: resultado EMPATE
+{ dur:8.5, music:'main', build:()=>sceneSVG(room(false)+desk(false)+robG('rob',130,250,160,'neutral',PN)+`<g id="pics"></g>`), cues:[
+  [0,()=>{camTo(1,0,0,true);cap('VOCÊS <em>ESCOLHERAM...</em>','top')}],
+  [1.8,()=>{cap('');fx.insertAdjacentHTML('beforeend','<div class="stamp">EMPATE!</div>');setRob('rob','shock',PN);sfx('boing');shake()}],
+  [3.4,()=>{$('fx').querySelector('.stamp')?.remove();add('pics',`<g class="pop tb"><rect x="30" y="160" width="90" height="70" rx="8" fill="#e8483b" stroke="${INK}" stroke-width="4"/><text x="75" y="203" text-anchor="middle" font-family="Luckiest Guy,Impact" font-size="20" fill="#fff" stroke="${INK}" stroke-width="1">DENTES</text></g>`);sfx('pop');setRob('rob','think',PN);cap('ARRUMAR OS <em>DENTES</em>...')}],
+  [5.2,()=>{add('pics',`<g class="pop tb"><rect x="240" y="160" width="90" height="70" rx="8" fill="#3ee36b" stroke="${INK}" stroke-width="4"/><text x="285" y="203" text-anchor="middle" font-family="Luckiest Guy,Impact" font-size="20" fill="#fff" stroke="${INK}" stroke-width="1">QUARTO</text></g>`);sfx('pop');setRob('rob','shock',{...PN,tilt:-8});cap('E... ARRUMAR O <em>QUARTO!</em>','green')}],
+  [6.8,()=>{setRob('rob','sad',PN);cap('');banner('<small>DIAS RESTANTES</small> 9 &nbsp;·&nbsp; <small>GLOW UP</small> 0%');sfx('ding')}],
+  [8.2,()=>banner('')]]},
 // 1 — Vinheta Dia 2
 { dur:2.6, music:'main', build:()=>sceneSVG(`<rect width="360" height="640" fill="#3ec9c0"/><g class="burst">${Array.from({length:12},(_,i)=>`<path d="M180 300 L${180+600*Math.cos(i*Math.PI/6)} ${300+600*Math.sin(i*Math.PI/6)} L${180+600*Math.cos(i*Math.PI/6+.26)} ${300+600*Math.sin(i*Math.PI/6+.26)}Z" fill="#5fe0d6"/>`).join('')}</g>${robG('rob',100,350,160,'shock',PN,'pop')}`)+`<div class="title" style="padding-bottom:40%"><span>DIA 2</span><span>9 DIAS</span><span>PRO ENCONTRO</span></div>`, cues:[[0,()=>{camTo(1,0,0,true);flash();sfx('whoosh');cap('')}],[.5,()=>sfx('sparkle')]]},
-// 2 — Roberto percebe o trabalho dobrado
-{ dur:8, music:'main', build:()=>sceneSVG(room(false)+desk(false)+robG('rob',130,250,160,'neutral',PN)+`<g id="pics"></g>`), cues:[
-  [0,()=>{camTo(1,0,0,true);flash();sfx('whoosh');cap('POIS É...')}],
-  [.8,()=>{add('pics',`<g class="pop tb"><rect x="30" y="160" width="90" height="70" rx="8" fill="#e8483b" stroke="${INK}" stroke-width="4"/><text x="75" y="203" text-anchor="middle" font-family="Luckiest Guy,Impact" font-size="20" fill="#fff" stroke="${INK}" stroke-width="1">DENTES</text></g>`);sfx('pop');setRob('rob','think',PN)}],
-  [1.6,()=>{add('pics',`<g class="pop tb"><rect x="240" y="160" width="90" height="70" rx="8" fill="#3ee36b" stroke="${INK}" stroke-width="4"/><text x="285" y="203" text-anchor="middle" font-family="Luckiest Guy,Impact" font-size="20" fill="#fff" stroke="${INK}" stroke-width="1">QUARTO</text></g>`);sfx('pop');setRob('rob','think',{...PN,tilt:-8})}],
-  [2.6,()=>{cap('ELE QUERIA <em>SÓ UMA</em>...');camTo(1.15,0,2)}],
-  [4.2,()=>{camTo(1.9,0,10,true);setRob('rob','shock',PN);sfx('boing');shake();cap('TRABALHO <em>DOBRADO!</em>','red')}],
-  [5.8,()=>{camTo(1.1,0,0);setRob('rob','sad',PN);cap('');banner('<small>DIAS RESTANTES</small> 9 &nbsp;·&nbsp; <small>GLOW UP</small> 0%');sfx('ding')}],
-  [7.6,()=>banner('')]]},
 // 3 — Missão 1: o sorriso no espelho
 { dur:10.5, music:'main', build:()=>sceneSVG(bathroom()), cues:[
   [0,()=>{camTo(1,0,0,true);flash();sfx('whoosh');cap('MISSÃO 1: <em>OS DENTES</em>','top')}],
@@ -596,8 +599,8 @@ const SCENES=[
   [0,()=>{camTo(1,0,0,true);flash();sfx('whoosh');cap('ETAPA 1: <em>CLAREAMENTO</em>','top')}],
   [1.4,()=>{camTo(1.4,6,6);setRob('rob','shock',PN);sfx('gulp');cap('NA CADEIRA...')}],
   [2.8,()=>{camTo(1.3,-8,4,true);cap('PROFISSIONAL <em>CUIDANDO</em>');sfx('scratch')}],
-  [4.4,()=>{camTo(1,0,0,true);clock('ALGUM TEMPO DEPOIS...');sfx('tick')}],
-  [6,()=>{clockHide();closeup('white',false,'glowy');sfx('sparkle');cap('NADA DE <em>IMPROVISO EM CASA</em>')}],
+  [4.4,()=>{camTo(1,0,0,true);wallClock(310,112,24);cap('ALGUM TEMPO DEPOIS...','top');sfx('tick')}],
+  [6,()=>{closeup('white',false,'glowy');sfx('sparkle');cap('NADA DE <em>IMPROVISO EM CASA</em>')}],
   [7.6,()=>{closeupHide();camTo(1.8,6,10,true);setRob('rob','smile',{...PN,teeth:'white'});flash();sfx('sparkle');cap('SORRISO <em>RENOVADO!</em>','green')}]]},
 // 6 — Prótese
 { dur:10, music:'main', build:()=>sceneSVG(bathroom()), cues:[
@@ -618,11 +621,11 @@ const SCENES=[
   [9,()=>{camTo(2.3,0,13,true);setRob('rob','smile',{teeth:'braces'});flash();shake();sfx('sparkle');cap('SORRISO <em>COLGATE!</em>','big')}]]},
 // 8 — Missão 2: o quarto (bagunça original)
 { dur:8, music:'main', build:()=>sceneSVG(room(false)+desk(false)+robG('rob',150,250,160,'happy',{...PN,teeth:'braces'})), cues:[
-  [0,()=>{camTo(1.9,4,10,true);flash();sfx('scratch');cap('MAS NÃO DAVA PRA <em>COMEMORAR...</em>','top')}],
-  [1.6,()=>{camTo(1.8,30,-14,true);setRob('rob','shock',{...PN,teeth:'braces'});sfx('boing');cap('')}],
-  [2.4,()=>{camTo(1.8,-28,-16);cap('ROUPAS...')}],[3.4,()=>{camTo(1.8,30,-24);cap('EMBALAGENS...')}],
-  [4.4,()=>{camTo(1,0,0);setRob('rob','sad',PN);sfx('fail');cap('')}],
-  [5.4,()=>{clock('');$('clk').classList.add('timer');banner('MISSÃO: ORGANIZAR O QUARTO!','go');sfx('tick')}]]},
+  [0,()=>{camTo(1.9,4,10,true,1);flash();sfx('scratch');cap('MAS NÃO DAVA PRA <em>COMEMORAR...</em>','top')}],
+  [1.6,()=>{camTo(1.8,30,-14,true,1);setRob('rob','shock',{...PN,teeth:'braces'});sfx('boing');cap('')}],
+  [2.4,()=>{camTo(1.8,-28,-16,false,1);cap('ROUPAS...')}],[3.4,()=>{camTo(1.8,30,-24,false,1);cap('EMBALAGENS...')}],
+  [4.4,()=>{camTo(1,0,0,false,1);setRob('rob','sad',PN);sfx('fail');cap('')}],
+  [5.4,()=>{wallClock(166,205,24);banner('MISSÃO: ORGANIZAR O QUARTO!','go');sfx('tick')}]]},
 // 9 — Etapa 1: as roupas
 { dur:7, music:'main', build:()=>sceneSVG(room(false)+desk(false)+robG('rob',150,250,160,'neutral',{...PN,armR:'tug'})+`<g id="pile"></g>`), cues:[
   [0,()=>{camTo(1.2,0,4,true);flash();sfx('whoosh');banner('ETAPA 1 · ROUPAS','go');cap('')}],
@@ -669,10 +672,10 @@ const SCENES=[
 // 14 — 20 minutos encarando
 { dur:8.5, music:'night', build:()=>sceneSVG(roomClean(true)+desk(true)+robG('rob',196,240,140,'shock',{...PN,holdR:'phone'})), cues:[
   [0,()=>{camTo(2.2,-24,5,true);flash();sfx('boing');sparkEyes();cap('')}],
-  [1.6,()=>{clock('20 MINUTOS...');$('clk').classList.add('spin')}],
+  [1.6,()=>{wallClock(166,205,24,'spin');cap('20 MINUTOS...','top')}],
   [2.4,()=>{for(let i=0;i<6;i++)setTimeout(()=>sfx('tick'),i*250)}],
   [4.2,()=>{cap('<em>VINTE.</em> MINUTOS.','big')}],
-  [6.2,()=>{clockHide();camTo(2.4,-25,5);setRob('rob','happy',{...PN,holdR:'phone',teeth:'braces'});sfx('sparkle');cap('NÃO CONSEGUIA <em>ACREDITAR</em>')}]]},
+  [6.2,()=>{camTo(2.4,-25,5);setRob('rob','happy',{...PN,holdR:'phone',teeth:'braces'});sfx('sparkle');cap('NÃO CONSEGUIA <em>ACREDITAR</em>')}]]},
 // 15 — Espelho + GLOW UP 20%
 { dur:12, music:'main', build:()=>sceneSVG(bathroom()+`<rect width="360" height="640" fill="#fff3c4" opacity=".18"/>`), cues:[
   [0,()=>{camTo(1.3,0,6,true);flash();setRob('rob','neutral',{teeth:'braces'});cap('')}],
